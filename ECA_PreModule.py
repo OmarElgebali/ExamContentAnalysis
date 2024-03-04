@@ -101,16 +101,10 @@ def process_material(folder_path, augmentation_type='Synonym', number_of_augment
         is_describe=is_describe,
         is_augment=is_augment
     )
-    clean_docs = []
-    for raw in dataset:
-        clean_docs.append(clean_text(raw))
 
-    print(clean_docs)
-    print(len(clean_docs))
+    clean_docs = [clean_text(raw) for raw in dataset]
 
-    filtered_text = []
     lemmatizer = WordNetLemmatizer()
-    for w in clean_docs:
-        filtered_text.append(lemmatizer.lemmatize(w))
+    filtered_text = [lemmatizer.lemmatize(doc) for doc in clean_docs]
 
     return filtered_text

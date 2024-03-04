@@ -21,8 +21,8 @@ if __name__ == '__main__':
             col1_aug, col2_aug = st.columns(2)
             col1_aug.number_input("Number of Augmentations:", step=1, min_value=1, max_value=100,
                                   key='number_of_augmentation_outputs')
-            col2_aug.selectbox("Type of Augmentation", options=['Synonym', 'word2vec', 'contextualWord'],
-                               key='augmentation_type')
+            col2_aug.selectbox("Type of Augmentation", options=['contextualWord', 'Synonym', 'word2vec'],
+                               key='augmentation_type', disabled=True)
         else:
             st.session_state.augmentation_type = ''
             st.session_state.number_of_augmentation_outputs = 0
@@ -31,17 +31,14 @@ if __name__ == '__main__':
         if submit_material_btn:
             if file:
                 folder_path = extract_last_folder(search_file(file.name))
-                print(f"@ ck_descriptor: {st.session_state.ck_descriptor}")
-                print(f"@ ck_augmentor: {st.session_state.ck_augmentor}")
-                print(f"@ augmentation_type: {st.session_state.augmentation_type}")
-                print(f"@ number_of_augmentation_outputs: {st.session_state.number_of_augmentation_outputs}")
                 with st.status("Training BERTopic ...", expanded=True) as status:
                     dataset = process_material(
                         folder_path=folder_path,
                         # is_describe=st.session_state.ck_descriptor,
                         is_describe=False,
                         is_augment=st.session_state.ck_augmentor,
-                        augmentation_type=st.session_state.augmentation_type,
+                        # augmentation_type=st.session_state.augmentation_type,
+                        augmentation_type='contextualWord',
                         number_of_augmentation_outputs=st.session_state.number_of_augmentation_outputs
                     )
                     st.session_state.bertopic_dict = bertopic_model_call(
@@ -51,17 +48,6 @@ if __name__ == '__main__':
                     )
 
                     status.update(label="Training Completed!", state="complete", expanded=False)
-                # """################################# Visualization ###########################################"""
-
-                # """################################# Transform ###############################################"""
-                # print("#" * 200)
-                # doc = " What is the concept of Digital Signal Processing"
-                # print(doc)
-                # print("*" * 200)
-                #
-                # _topic, _prob = bertopic_dict['model'].transform([doc])
-                # print("Topic: ", _topic, "Prob: ", _prob)
-                # print("*" * 200)
                 st.toast("Model Trained Successfully", icon="✔️")
             else:
                 st.warning("No Material Uploaded")
@@ -71,10 +57,9 @@ if __name__ == '__main__':
         try:
             st.markdown(f"BERTopic Model Name *(Course Name)*: {st.session_state.bertopic_dict['model_name']}")
             fig_visualize_topics = st.session_state.bertopic_dict['model'].visualize_topics()
-            fig_visualize_barchart = st.session_state.bertopic_dict['model'].visualize_barchart()
-            # col1_visualize, col2_visualize = st.columns(2)
             st.write(fig_visualize_topics)
             st.divider()
+            fig_visualize_barchart = st.session_state.bertopic_dict['model'].visualize_barchart()
             st.write(fig_visualize_barchart)
             st.toast("Visualization Generated Successfully", icon="📈")
         except AttributeError:
@@ -110,12 +95,5 @@ if __name__ == '__main__':
                     st.info("Question not covered in given material")
                 else:
                     st.success("Question covered")
-                print(st.session_state.bertopic_dict['model'].get_topic(_topic[0]))
-                print("*" * 200)
-                print(_topic)
-                print("*" * 200)
-                print(_prob)
-                print("*" * 200)
-
         except AttributeError:
             st.error("Model not learned yet")
