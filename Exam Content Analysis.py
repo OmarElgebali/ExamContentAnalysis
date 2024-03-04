@@ -14,7 +14,7 @@ if __name__ == '__main__':
         file = st.file_uploader("Upload Materials", type=["pdf"],
                                 help="Upload File and will train the model on file's folder")
         col1_checks, col2_checks, col3_checks = st.columns(3)
-        col1_checks.checkbox("Apply Descriptor", key='ck_descriptor')
+        col1_checks.checkbox("Apply Descriptor", key='ck_descriptor', disabled=True)
         col2_checks.checkbox("Apply Augmentor", key='ck_augmentor')
         col3_checks.checkbox("Calculate Coherence", key='ck_coherence')
         if st.session_state.ck_augmentor:
@@ -38,7 +38,8 @@ if __name__ == '__main__':
                 with st.status("Training BERTopic ...", expanded=True) as status:
                     dataset = process_material(
                         folder_path=folder_path,
-                        is_describe=st.session_state.ck_descriptor,
+                        # is_describe=st.session_state.ck_descriptor,
+                        is_describe=False,
                         is_augment=st.session_state.ck_augmentor,
                         augmentation_type=st.session_state.augmentation_type,
                         number_of_augmentation_outputs=st.session_state.number_of_augmentation_outputs
@@ -61,9 +62,9 @@ if __name__ == '__main__':
                 # _topic, _prob = bertopic_dict['model'].transform([doc])
                 # print("Topic: ", _topic, "Prob: ", _prob)
                 # print("*" * 200)
-                st.toast("Model Trained Successfully :D")
+                st.toast("Model Trained Successfully", icon="✔️")
             else:
-                st.warning("No Material Uploaded !!")
+                st.warning("No Material Uploaded")
 
     with tab2:
         st.subheader("Visualization Section")
@@ -75,6 +76,7 @@ if __name__ == '__main__':
             st.write(fig_visualize_topics)
             st.divider()
             st.write(fig_visualize_barchart)
+            st.toast("Visualization Generated Successfully", icon="📈")
         except AttributeError:
             st.error("Model not learned yet")
 
@@ -82,17 +84,16 @@ if __name__ == '__main__':
         st.subheader("Analytics Section")
         try:
             st.markdown(f"BERTopic Model Name *(Course Name)*: {st.session_state.bertopic_dict['model_name']}")
-            st.markdown("#### Coherence")
-            st.write("Coherence calculated for this model is", float(st.session_state.bertopic_dict['coherence']))
-            # st.divider()
+            if 'coherence' in st.session_state.bertopic_dict:
+                st.markdown("#### Coherence")
+                st.write("Coherence calculated for this model is", float(st.session_state.bertopic_dict['coherence']))
             st.markdown("#### Document Info")
             st.write(st.session_state.bertopic_dict['document_info'])
-            # st.divider()
             st.markdown("#### Topic Info")
             st.write(st.session_state.bertopic_dict['topic_info'])
-            # st.divider()
             st.markdown("#### Topics")
             st.write(st.session_state.bertopic_dict['topics'])
+            st.toast("Analytics Generated Successfully", icon="📊")
         except AttributeError:
             st.error("Model not learned yet")
 
@@ -100,6 +101,7 @@ if __name__ == '__main__':
         st.subheader("Prediction Section")
         try:
             st.markdown(f"BERTopic Model Name *(Course Name)*: {st.session_state.bertopic_dict['model_name']}")
+            st.toast("Ready to Predict", icon="💭")
             txt_question = st.text_area("Provide your question")
             predict_btn = st.button("Classify Question")
             if predict_btn:
