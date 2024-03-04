@@ -10,7 +10,15 @@ from PIL import Image
 import re
 import fitz  # PyMuPDF library
 
-from ECA_TextAugmentation import augmentation
+
+def search_file(file_name):
+    current_folder = os.getcwd()  # Get the current working directory
+
+    for folder_name, _, filenames in os.walk(current_folder):
+        if file_name in filenames:
+            return folder_name
+
+    return None
 
 
 def extract_last_folder(path):
@@ -45,7 +53,7 @@ def find_pdf_in_data_folder(filename):
     :return: The absolute path to the file if found, otherwise None.
     """
     current_folder = os.getcwd()  # Get the current working directory
-    data_folder = os.path.join(current_folder, 'Models', 'Data')  # Path to 'Models/Data/' folder
+    data_folder = os.path.join(current_folder, 'Data')  # Path to 'Models/Data/' folder
 
     files_in_data_folder = os.listdir(data_folder)
 
@@ -196,7 +204,7 @@ def save_extracted_docs(file_path, docs):
     :param file_path: The path to the file where documents will be saved.
     :param docs: The documents to be saved.
     """
-    with open('Models/Data/' + file_path, 'wb') as file:
+    with open('Data/' + file_path, 'wb') as file:
         pickle.dump(docs, file)
 
 
@@ -209,29 +217,3 @@ def load_extracted_docs(file_path):
     with open(file_path, 'rb') as file:
         docs = pickle.load(file)
     return docs
-
-
-def extract_docs(folder_path):
-    """
-    Extract documents from PDF files within a folder, caching the result using pickle.
-    :param folder_path: The path to the folder containing PDF files.
-    :return: A list of extracted text for each PDF file in the folder.
-    """
-    file_path = extract_last_folder(folder_path)
-    docs_raw_file = f'{file_path}-raw.pkl'
-    docs_aug_file = f'{file_path}-aug.pkl'
-
-    docs_aug_file_path = find_pdf_in_data_folder(docs_aug_file)
-    if docs_aug_file_path:
-        return load_extracted_docs(docs_aug_file_path)
-
-    docs_raw_file_path = find_pdf_in_data_folder(docs_raw_file)
-    if docs_raw_file_path:
-        docs_raw = load_extracted_docs(docs_raw_file_path)
-    else:
-        docs_raw = extract_folder_pdf_text(folder_path, True)
-        save_extracted_docs(docs_raw_file, docs_raw)
-
-    docs_aug = augmentation(docs_raw)
-    save_extracted_docs(docs_aug_file, docs_aug)
-    return docs_aug

@@ -36,19 +36,19 @@ def text_augment(input_text, number_of_outputs=1, aug_type='Synonym'):
             aug_src='ppdb',
             model_path=model_dir + 'ppdb-2.0-tldr'
         )
-    augmented_text = aug.augment(input_text, n=number_of_outputs)
+    augmented_text = aug.augment(input_text, n=number_of_outputs+1)
     # print(f"Original:\n{input_text}\nAugmented Text:\n{augmented_text}")
     return augmented_text
 
 
-def augmentation(dataset, number_of_outputs=2, aug_type='Synonym'):
+def augmentation(dataset, number_of_outputs=1, aug_type='Synonym'):
     """
     Augment a dataset using a specified text augmentation method.
 
     Parameters:
     - dataset (list): The input dataset to be augmented.
     - number_of_outputs (int): Number of augmented outputs to generate for each input.
-                              Default is 2.
+                              Default is 1.
     - aug_type (str): The type of text augmentation to apply.
                       Options: 'Synonym', 'word2vec', 'contextualWord'.
                       Default is 'Synonym'.
@@ -58,7 +58,7 @@ def augmentation(dataset, number_of_outputs=2, aug_type='Synonym'):
     """
     augmented_data = []
     for row in dataset:
-        augmented_data.extend(text_augment(row, number_of_outputs, aug_type))
+        augmented_data.extend(text_augment(row, number_of_outputs+1, aug_type))
     extended_dataset = dataset + augmented_data
     random.shuffle(extended_dataset)
     return extended_dataset
