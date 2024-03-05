@@ -8,6 +8,14 @@ info = """
 The Exam Content Analysis module is designed to analyze a large number of PDFs in specific topics, such as neural networks or image processing. The module follows a step-by-step process to generate a comprehensive dataset for further examination.
 
 ---
+## User-Side Workflow
+
+1. User provides the course name uploads the a file that must be in a folder that is in the directory of project 
+- > **Note:** If the materials are learned before try to provide the same name to use the learned model to save time.
+- > **Example:** Current directory `/project/` and file named `lecture.pdf` is in `/project/course/`.
+2. User provides a question then automatically determines whether its covered or not.
+
+---
 ## Phases
 
 ### **1. PDF Text Extraction:** 
@@ -26,16 +34,8 @@ The dataset is fed into the BERTopic model, which applies embeddings, dimensiona
 Transform the question using the model's approach and check if it corresponds to a generated topic. Syllabus inclusion is based on whether the transformed question belongs to the range `[0, n-1]` or is an outlier topic `-1`.
 
 ---
-## Run
 
-To start the UI run the following command line:
-```console
-streamlit run '.\Exam Content Analysis.py'
-```
-
----
-
-## Workflow
+## Developer-Side Workflow
 
 ### *Inputs*
 
